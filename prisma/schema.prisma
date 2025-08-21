@@ -1,0 +1,31 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+model routes {
+id_routes Int @id @default(autoincrement())
+plate String
+departure_time DateTime @default(now())
+arrival_time DateTime @default(now())
+route_advisors route_advisor[]
+}
+
+model route_advisor {
+  id_route_advisor Int @id @default(autoincrement())
+  name String
+  last_name String
+  number_phone Int
+  routes_id Int
+  route routes @relation(fields: [routes_id], references: [id_routes])
+}
