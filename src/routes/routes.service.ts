@@ -1,4 +1,4 @@
-import { Body, Injectable } from '@nestjs/common';
+import { Body, HttpCode, HttpException, Injectable } from '@nestjs/common';
 import { CreateRouteDto } from './dto/create-route.dto';
 import { UpdateRouteDto } from './dto/update-route.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -11,12 +11,32 @@ export class RoutesService {
   ) {}
   
 
-  create(body: any) {
-    return this.prisma.routes.create({
-      data: body
-    })
-  }
+ async create( branDto: CreateRouteDto) {
+  // Validación lógica (de negocio)
+  // La marca ya existe
+  // Si ya existe devolver un error
+  let existe = await this.prisma.routes.findFirst({
+    where: { plate: branDto.plate }
+  });
 
+  if (existe) {
+    // Error: placa ya existe
+    throw new HttpException({
+      "exito": false,
+      "mensaje": "la placa ya existe"
+    }, 404)
+  }
+   else {
+    // No existe la marca
+    // se puede crear
+    return await this.prisma.routes.create({
+      data: {plate: branDto.plate,
+        departure_time: branDto.departure_time, 
+        arrival_time: branDto.arrival_time
+      }
+   });
+  }
+}
   
   findAll() {
     return this.prisma.routes.findMany({

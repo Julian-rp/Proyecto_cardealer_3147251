@@ -10,8 +10,8 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 model routes {
 id_routes Int @id @default(autoincrement())
@@ -28,4 +28,19 @@ model route_advisor {
   number_phone Int
   routes_id Int
   route routes @relation(fields: [routes_id], references: [id_routes])
+}
+
+//Modelos de autenticacion
+model estado{
+  id Int @id @default(autoincrement())
+  estado String
+  usuarios usuarios[]
+}
+model usuarios{
+  id Int @id @default(autoincrement())
+  username String @unique
+  email String @unique
+  password String
+  estado_id Int
+  estado estado @relation(fields: [estado_id], references: [id])
 }
